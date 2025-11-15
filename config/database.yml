@@ -5,13 +5,16 @@ default: &default
 
 development:
   <<: *default
-  database: warehouse_backend_development
+  database: business_management_dev
   username: <%= Rails.application.credentials.dig(:database_user) %>
   password: <%= Rails.application.credentials.dig(:database_password) %>
+  port: 5432
+  host: localhost
+  
 
 test:
   <<: *default
-  database: warehouse_backend_test
+  database: business_management_test
 
 production:
   <<: *default
