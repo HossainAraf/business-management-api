@@ -10,18 +10,18 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_05_08_172203) do
+ActiveRecord::Schema[8.1].define(version: 2025_11_15_232628) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
 
   # Custom types defined in this database.
   # Note that some types may not work with other database engines. Be careful if changing database.
-  create_enum "adjustment_type_enum", ["add", "remove"]
-  create_enum "stock_entry_type", ["purchase", "adjustment", "return"]
+  create_enum "bm_adjustment_type_enum", ["add", "remove"]
+  create_enum "bm_stock_entry_type", ["purchase", "adjustment", "return"]
 
-  create_table "adjustments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.enum "adjustment_type", null: false, enum_type: "adjustment_type_enum"
+  create_table "bm_adjustments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.enum "adjustment_type", null: false, enum_type: "bm_adjustment_type_enum"
     t.datetime "created_at", null: false
     t.uuid "item_id", null: false
     t.integer "quantity"
@@ -29,17 +29,17 @@ ActiveRecord::Schema[8.1].define(version: 2025_05_08_172203) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "items", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "bm_items", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.datetime "created_at", null: false
     t.text "description"
     t.string "name"
     t.string "sku", null: false
     t.decimal "unit_price", precision: 10, scale: 2
     t.datetime "updated_at", null: false
-    t.index ["sku"], name: "index_items_on_sku", unique: true
+    t.index ["sku"], name: "index_bm_items_on_sku", unique: true
   end
 
-  create_table "purchase_items", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "bm_purchase_items", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.datetime "created_at", null: false
     t.uuid "item_id", null: false
     t.uuid "purchase_id", null: false
@@ -49,7 +49,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_05_08_172203) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "purchases", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "bm_purchases", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.datetime "created_at", null: false
     t.uuid "created_by"
     t.date "date"
@@ -57,10 +57,10 @@ ActiveRecord::Schema[8.1].define(version: 2025_05_08_172203) do
     t.string "supplier_name"
     t.decimal "total_amount", precision: 12, scale: 2
     t.datetime "updated_at", null: false
-    t.index ["invoice_number"], name: "index_purchases_on_invoice_number", unique: true
+    t.index ["invoice_number"], name: "index_bm_purchases_on_invoice_number", unique: true
   end
 
-  create_table "sale_items", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "bm_sale_items", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.datetime "created_at", null: false
     t.uuid "item_id", null: false
     t.integer "quantity"
@@ -70,7 +70,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_05_08_172203) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "sales", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "bm_sales", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.datetime "created_at", null: false
     t.uuid "created_by"
     t.string "customer_name"
@@ -78,13 +78,13 @@ ActiveRecord::Schema[8.1].define(version: 2025_05_08_172203) do
     t.string "invoice_number", null: false
     t.decimal "total_amount", precision: 12, scale: 2
     t.datetime "updated_at", null: false
-    t.index ["invoice_number"], name: "index_sales_on_invoice_number", unique: true
+    t.index ["invoice_number"], name: "index_bm_sales_on_invoice_number", unique: true
   end
 
-  create_table "stock_entries", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "bm_stock_entries", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.datetime "created_at", null: false
     t.uuid "created_by", null: false
-    t.enum "entry_type", null: false, enum_type: "stock_entry_type"
+    t.enum "entry_type", null: false, enum_type: "bm_stock_entry_type"
     t.uuid "item_id", null: false
     t.text "notes"
     t.integer "quantity", null: false
@@ -92,23 +92,23 @@ ActiveRecord::Schema[8.1].define(version: 2025_05_08_172203) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "users", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "bm_users", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "email", null: false
     t.string "name"
     t.string "password_digest"
     t.string "role"
     t.datetime "updated_at", null: false
-    t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["email"], name: "index_bm_users_on_email", unique: true
   end
 
-  add_foreign_key "adjustments", "items"
-  add_foreign_key "purchase_items", "items"
-  add_foreign_key "purchase_items", "purchases"
-  add_foreign_key "purchases", "users", column: "created_by"
-  add_foreign_key "sale_items", "items"
-  add_foreign_key "sale_items", "sales"
-  add_foreign_key "sales", "users", column: "created_by"
-  add_foreign_key "stock_entries", "items"
-  add_foreign_key "stock_entries", "users", column: "created_by"
+  add_foreign_key "bm_adjustments", "bm_items", column: "item_id"
+  add_foreign_key "bm_purchase_items", "bm_items", column: "item_id"
+  add_foreign_key "bm_purchase_items", "bm_purchases", column: "purchase_id"
+  add_foreign_key "bm_purchases", "bm_users", column: "created_by"
+  add_foreign_key "bm_sale_items", "bm_items", column: "item_id"
+  add_foreign_key "bm_sale_items", "bm_sales", column: "sale_id"
+  add_foreign_key "bm_sales", "bm_users", column: "created_by"
+  add_foreign_key "bm_stock_entries", "bm_items", column: "item_id"
+  add_foreign_key "bm_stock_entries", "bm_users", column: "created_by"
 end
