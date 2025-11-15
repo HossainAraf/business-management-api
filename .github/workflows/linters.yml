@@ -1,0 +1,32 @@
+name: Linters
+
+on:
+  pull_request:
+
+env:
+  FORCE_COLOR: 1
+
+jobs:
+  rubocop:
+    name: Rubocop
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.3.9
+
+      - name: Install dependencies
+        run: bundle install
+
+      - name: Run Rubocop
+        run: bundle exec rubocop --color
+
+      - name: Rubocop Autocorrect
+        run: bundle exec rubocop --color -a || true
+        continue-on-error: true
+
+      - name: Rubocop Report (after autocorrect)
+        run: bundle exec rubocop --color || true
+        continue-on-error: true
