@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 class Sale < ApplicationRecord
   has_many :sale_items, dependent: :destroy
   has_many :items, through: :sale_items

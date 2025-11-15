@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 class StockEntry < ApplicationRecord
   belongs_to :item
   belongs_to :creator, class_name: 'User', foreign_key: :created_by
